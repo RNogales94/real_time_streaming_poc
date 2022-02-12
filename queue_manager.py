@@ -1,12 +1,22 @@
 import pika
-from config import RABBITMQ_CONNECTION_STRING
 
-connection_string = RABBITMQ_CONNECTION_STRING
-connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_CONNECTION_STRING))
-channel = connection.channel()
 
-channel.queue_declare(queue='weather')
+class QueueManager:
+    def __init__(self, connection_string: str):
+        self.connection = pika.BlockingConnection(pika.URLParameters(connection_string))
+        self.channel = self.connection.channel()
+        self.queue_name = 'weather'
 
-channel.basic_publish(exchange='',
-                      routing_key='weather',
-                      body="hello")
+    def __init_channels(self) -> None:
+        self.channel.queue_declare(queue=self.queue_name)
+
+    def publish(self, data: str) -> None:
+        self.channel.basic_publish(exchange='',
+                                   routing_key=self.queue_name,
+                                   body=str(data))
+
+
+
+
+
+
